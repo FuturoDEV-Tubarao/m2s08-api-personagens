@@ -1,6 +1,7 @@
 package com.senai.personagem.controller;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.senai.personagem.model.Personagem;
@@ -25,8 +27,19 @@ public class PersonagemController {
 
 
     @GetMapping
-    public ResponseEntity<List<Personagem>> listar() {
-        var personagens = service.consultar();
+    public ResponseEntity<List<Personagem>> listar(
+            @RequestParam(required = false) String nome, 
+            @RequestParam(required = false) String referencia) {
+        List<Personagem> personagens = new ArrayList<>();
+        if (nome == null && referencia == null) {
+            personagens = service.consultar();
+        } else if (nome != null && referencia == null) {
+            Personagem personagem = service.consultarPorNome(nome);
+            personagens.add(personagem);
+        } else {
+            Personagem personagem = service.consultarPor(nome, referencia);
+            personagens.add(personagem);
+        }
         return ResponseEntity.ok().body(personagens);
     }
 
